@@ -1,30 +1,36 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import createStore from './createStore';
+import reducer from './reducer';
+
+const store = createStore(reducer);
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      counter: 0,
-    };
+    this.unsubscribe = store.subscribe(this.storeChanged.bind(this));
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  storeChanged() {
+    this.forceUpdate();
   }
 
   increment() {
-    this.setState(prevState => ({
-      counter: prevState.counter + 1,
-    }));
+    store.dispatch({ type: 'INCREMENT' });
   }
 
   decrement() {
-    this.setState(prevState => ({
-      counter: prevState.counter - 1,
-    }));
+    store.dispatch({ type: 'DECREMENT' });
   }
 
   render() {
-    const { counter } = this.state;
+    const { counter } = store.getState();
 
     return (
       <div className="App">
